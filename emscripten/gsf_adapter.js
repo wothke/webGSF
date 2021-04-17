@@ -20,7 +20,7 @@ GSFBackendAdapter = (function(){ var $this = function (modlandMode) {
 		
 		// aka dumshit ftp.modland.com mode:
 		this.modlandMode= (typeof modlandMode != 'undefined') ? modlandMode : false;
-		this.originalFile= "";
+		this.originalFile= "";		// FIXME XXX dead/obsolete code
 		this.modlandMap= {};	// mapping of weird shit filenames used on modland 
 
 		if (!backend_gsf.Module.notReady) {
@@ -75,6 +75,7 @@ GSFBackendAdapter = (function(){ var $this = function (modlandMode) {
 		mapUrl: function(filename) {			
 			// used transform the "internal filename" to a valid URL
 			var uri= this.mapFs2Uri(filename);
+			uri= decodeURI(uri);	// replace escape sequences... 
 			return uri;
 		},
 		mapInternalFilename: function(overridePath, basePath, filename) {
@@ -90,7 +91,7 @@ GSFBackendAdapter = (function(){ var $this = function (modlandMode) {
 			var sp = filename.split('/');
 			var fn = sp[sp.length-1];					
 			var path= filename.substring(0, filename.lastIndexOf("/"));	
-			if (path.lenght) path= path+"/";
+			if (path.lenght) path= path+"/";	// FIXME XXX why does impl work in spite of lenght TYPO?!!!!
 			
 			return [path, fn];
 		},
@@ -107,7 +108,7 @@ GSFBackendAdapter = (function(){ var $this = function (modlandMode) {
 					
 					var output= tmpPathFilenameArray[1].toLowerCase();	// idiots!
 					if (tmpPathFilenameArray[1] != output) {	// remember the filename mapping (path is the same)
-						this.modlandMap[output.replace(/^.*[\\\/]/, '')]= tmpPathFilenameArray[1].replace(/^.*[\\\/]/, '');	// needed to create FS expected by "amiga"
+						this.modlandMap[output.replace(/^.*[\\\/]/, '')]= tmpPathFilenameArray[1].replace(/^.*[\\\/]/, '');	// needed to create FS expected by emu
 						tmpPathFilenameArray[1]= output;
 					}				
 				} else  {
@@ -188,7 +189,7 @@ GSFBackendAdapter = (function(){ var $this = function (modlandMode) {
 
 			var array = this.Module.HEAP32.subarray(ret>>2, (ret>>2)+numAttr);
 			result.title= this.Module.Pointer_stringify(array[0]);
-			if (!result.title.length) result.title= filename;		
+			if (!result.title.length) result.title= filename.replace(/^.*[\\\/]/, '');		
 			result.artist= this.Module.Pointer_stringify(array[1]);		
 			result.game= this.Module.Pointer_stringify(array[2]);
 			result.year= this.Module.Pointer_stringify(array[3]);
